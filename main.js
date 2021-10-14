@@ -67,13 +67,17 @@ const utils = {
     }
     return output;
   },
-  contains: function(array, item) {
+  contains: function (array, item) {
     return array.indexOf(item) >= 0;
-  }
+  },
 };
 
-Array.prototype.shuffle = function() { return utils.shuffle(this);};
-Array.prototype.contains = function(item) { return utils.contains(this, item);};
+Array.prototype.shuffle = function () {
+  return utils.shuffle(this);
+};
+Array.prototype.contains = function (item) {
+  return utils.contains(this, item);
+};
 
 let app = {
   el: "#app",
@@ -86,7 +90,7 @@ let app = {
       rh: true,
       rk: false,
       hk: false,
-      answers: 4,
+      answers: 6,
     },
     kanas: [],
     question: "あ",
@@ -159,18 +163,17 @@ let app = {
     answer: function (v) {
       const self = this;
 
-      const question = self.kanas.filter(kana => {
+      const question = self.kanas.filter((kana) => {
         return kana.contains(self.question);
       })[0];
 
-      if(question.contains(v)) {
+      if (question.contains(v)) {
         self.score += 1;
         self.generateQuestion();
       } else {
         self.score = 0;
         self.wrongAnswers.push(v);
       }
-      
     },
     changeOption: function (v) {
       const self = this;
