@@ -1,5 +1,10 @@
 /* noto-sans-regular - latin */
-@import url('https://fonts.googleapis.com/css?family=Noto%20Sans&display=swap');
+@font-face {
+  font-family: 'Noto Sans';
+  font-style: normal;
+  font-weight: 400;
+  src: url('fonts/NotoSansJP-Regular.otf');
+}
 
 * {
   box-sizing: border-box;
