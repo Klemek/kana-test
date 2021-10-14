@@ -28,9 +28,9 @@
         <div class='answer' type="button" v-for='v in answers' v-on:click="answer(v)" :class="{disabled:wrongAnswers.contains(v)}">{{ v }}</div>
       </div>
       <h3>Options</h3>
-      <input type="checkbox" id="opt_rh" v-model="options.rh"><label for="opt_rh">Romaji ↔ ひらがな</label><br />
-      <input type="checkbox" id="opt_rk" v-model="options.rk"><label for="opt_rk">Romaji ↔ カタカナ</label><br />
-      <input type="checkbox" id="opt_hk" v-model="options.hk"><label for="opt_hk">ひらがな ↔ カタカナ</label><br />
+      <input type="checkbox" id="opt_rh" v-model="options.rh"><label for="opt_rh">Romaji → ひらがな</label> <input type="checkbox" id="opt_hr" v-model="options.hr"><label for="opt_hr">ひらがな → Romaji</label><br />
+      <input type="checkbox" id="opt_rk" v-model="options.rk"><label for="opt_rk">Romaji → カタカナ</label> <input type="checkbox" id="opt_kr" v-model="options.kr"><label for="opt_kr">カタカナ → Romaji</label><br />
+      <input type="checkbox" id="opt_hk" v-model="options.hk"><label for="opt_hk">ひらがな ↔ カタカナ</label> <input type="checkbox" id="opt_kh" v-model="options.kh"><label for="opt_kh">カタカナ → ひらがな</label><br />
       <br />
       <span v-for="char in options.available">
         <input type="checkbox" :id="'opt_' + char" v-model="options.selected" :value="char"><label :for="'opt_' + char">{{ char ? char : '()' }}&nbsp;</label>

@@ -88,8 +88,11 @@ let app = {
       available: kanas.rows,
       selected: kanas.rows,
       rh: true,
+      hr: true,
       rk: false,
+      kr: false,
       hk: false,
+      kh: false,
       answers: 6,
     },
     kanas: [],
@@ -142,15 +145,12 @@ let app = {
       //TODO add difficulty
 
       const mappings = [];
-      if (self.options.rh) {
-        mappings.push([0, 1], [1, 0]);
-      }
-      if (self.options.rk) {
-        mappings.push([0, 2], [2, 0]);
-      }
-      if (self.options.hk) {
-        mappings.push([1, 2], [2, 1]);
-      }
+      if (self.options.rh) { mappings.push([0, 1]); }
+      if (self.options.hr) { mappings.push([1, 0]); }
+      if (self.options.rk) { mappings.push([0, 2]); }
+      if (self.options.kr) { mappings.push([2, 0]); }
+      if (self.options.hk) { mappings.push([1, 2]); }
+      if (self.options.kh) { mappings.push([2, 1]); }
       const mapping = utils.randitem(mappings);
 
       self.question = self.kanas[questionIndex][mapping[0]];
