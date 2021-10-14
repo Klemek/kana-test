@@ -1,6 +1,9 @@
+/* noto-sans-regular - latin */
+@import url('https://fonts.googleapis.com/css?family=Noto%20Sans&display=swap');
+
 * {
   box-sizing: border-box;
-  font-family: Verdana, serif;
+  font-family: 'Noto Sans', Verdana, serif;
   color: #424242;
 }
 
