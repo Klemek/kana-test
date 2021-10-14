@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Change this you moron</title>
-    <link rel="stylesheet" href="style.css">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Kana Test</title>
+    <link rel="stylesheet" href="style.css" />
     <script type="text/javascript" src="lib/vue.min.js"></script>
     <script type="text/javascript" src="main.js"></script>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <!-- card related -->
     <!--
     <meta name="twitter:card" content="summary_large_image">
@@ -18,14 +18,29 @@
     <meta property="twitter:image" content="">
     <meta property="org:url" content="https://...">
     -->
-</head>
-<body>
-    <main id="app" style="display:none">
-        <h1>{{title}}</h1>
-        <br>
-        <p v-html="content"></p>
-        <br>
-        <small><a href="https://twitter.com/_klemek" target="_blank">@Klemek</a> - <a href="" target="_blank">Github Repository</a> - 2019</small>
+  </head>
+  <body>
+    <main id="app" style="display: none">
+      <h1>{{title}}</h1>
+      <div id='score'>score : {{ score }}</div>
+      <div id='question'><span>{{question}}</span></div>
+      <div id='answers'>
+        <div class='answer' type="button" v-for='v in answers' v-on:click="answer(v)" :class="{disabled:wrongAnswers.contains(v)}">{{ v }}</div>
+      </div>
+      <h3>Options</h3>
+      <input type="checkbox" id="opt_rh" v-model="options.rh"><label for="opt_rh">Romaji ↔ ひらがな</label><br />
+      <input type="checkbox" id="opt_rk" v-model="options.rk"><label for="opt_rk">Romaji ↔ カタカナ</label><br />
+      <input type="checkbox" id="opt_hk" v-model="options.hk"><label for="opt_hk">ひらがな ↔ カタカナ</label><br />
+      <br />
+      <span v-for="char in options.available">
+        <input type="checkbox" :id="'opt_' + char" v-model="options.selected" :value="char"><label :for="'opt_' + char">{{ char ? char : '()' }}&nbsp;</label>
+      </span>
+      <br />
+      <br />
+      <small
+        ><a href="https://twitter.com/_klemek" target="_blank">@Klemek</a> -
+        <a href="" target="_blank">Github Repository</a> - 2021</small
+      >
     </main>
-</body>
+  </body>
 </html>
