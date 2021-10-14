@@ -129,6 +129,7 @@ let app = {
         },
         kanas: [],
         question: 'あ',
+        lastQuestions: [ '', '', '' ],
         answers: [ 'A', 'I', 'U', 'O' ],
         wrongAnswers: [],
     },
@@ -198,7 +199,11 @@ let app = {
 
             const mapping = kanas.mappings[utils.randitem(self.options.mappings)];
 
-            const questionIndex = utils.randindex(self.kanas);
+            const questionIndex = utils.randindex(self.kanas, self.lastQuestions);
+
+            self.lastQuestions.pop(0);
+            self.lastQuestions.push(questionIndex);
+
             const similarIndexes = self.findSimilars(questionIndex, mapping);
             const otherIndexes = utils.randindexes(self.kanas, Math.max(0, self.options.answers - similarIndexes.length - 1), questionIndex, ...similarIndexes );
 
@@ -209,6 +214,12 @@ let app = {
                 .map((index) => self.kanas[index][mapping[1]]);
             self.answers = self.answers.shuffle();
             self.wrongAnswers = [];
+
+            /*
+             * setTimeout(() => {
+             *     this.answer(self.question);
+             * });
+             */
         },
         answer: function (v) {
             const self = this;
