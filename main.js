@@ -174,6 +174,8 @@ let app = {
         self.score = 0;
         self.wrongAnswers.push(v);
       }
+
+      document.activeElement.blur();
     },
     changeOption: function (v) {
       const self = this;
