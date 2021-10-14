@@ -83,15 +83,18 @@ table {
   color: #424242;
 }
 
-.answer:hover {
-  background-color: #E0E0E0;
-  color: #424242;
+@media (hover: hover) {
+  .answer:hover {
+    background-color: #E0E0E0;
+    color: #424242;
+  }
 }
-/* 
+
+
 .answer:active {
   background-color: #757575;
   color: #eeeeee;
-} */
+}
 
 .disabled {
   background-color: #f44336;
