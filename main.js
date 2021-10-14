@@ -151,14 +151,14 @@ let app = {
             self.options.selected.forEach((prefix) => {
                 const row = kanas.rows.indexOf(prefix);
                 if (prefix === '(N)') {
-                    self.kanas.push([ 'N', kanas.hiraganas[row][0], kanas.katakanas[row][0] ]);
+                    self.kanas.push([ 'N', kanas.hiraganas[row][0], kanas.katakanas[row][0], row, 0 ]);
                 } else {
                     kanas.columns.forEach((suffix, column) => {
                         const text = kanas.exceptions[prefix + suffix]
                             ? kanas.exceptions[prefix + suffix]
                             : prefix + suffix;
                         if (kanas.hiraganas[row][column] || kanas.katakanas[row][column]) {
-                            self.kanas.push([ text, kanas.hiraganas[row][column], kanas.katakanas[row][column] ]);
+                            self.kanas.push([ text, kanas.hiraganas[row][column], kanas.katakanas[row][column], row, column ]);
                         }
                     });
                 }
@@ -181,19 +181,12 @@ let app = {
                     similarIndexes.push(self.kanas.indexOf(trap));
                 }
             }
-            if (kana[0].length === 1) {
-                if (kana[0] !== 'N') { // !== (N)
-                    const sameRow = self.kanas.filter((kana2, i) => !similarIndexes.contains(i) && kana2 !== kana && kana2[0].length === 1);
+            if (kana[0].length !== 1 || kana[0] !== 'N') {
+                const sameRow = self.kanas.filter((kana2, i) => !similarIndexes.contains(i) && kana2 !== kana && kana2[3] === kana[3]);
+                if (sameRow.length > 0) {
                     similarIndexes.push(self.kanas.indexOf(utils.randitem(sameRow)));
-                    const sameColumn = self.kanas.filter((kana2, i) => !similarIndexes.contains(i) && kana2 !== kana && kana2[0].substr(-1, 1) === kana[0].substr(-1, 1));
-                    if (sameColumn.length > 0) {
-                        similarIndexes.push(self.kanas.indexOf(utils.randitem(sameColumn)));
-                    }
                 }
-            } else {
-                const sameRow = self.kanas.filter((kana2, i) => !similarIndexes.contains(i) && kana2 !== kana && kana2[0].substr(0, 1) === kana[0].substr(0, 1));
-                similarIndexes.push(self.kanas.indexOf(utils.randitem(sameRow)));
-                const sameColumn = self.kanas.filter((kana2, i) => !similarIndexes.contains(i) && kana2 !== kana && kana2[0].substr(-1, 1) === kana[0].substr(-1, 1));
+                const sameColumn = self.kanas.filter((kana2, i) => !similarIndexes.contains(i) && kana2 !== kana && kana2[4] === kana[4]);
                 if (sameColumn.length > 0) {
                     similarIndexes.push(self.kanas.indexOf(utils.randitem(sameColumn)));
                 }
@@ -207,7 +200,7 @@ let app = {
 
             const questionIndex = utils.randindex(self.kanas);
             const similarIndexes = self.findSimilars(questionIndex, mapping);
-            const otherIndexes = utils.randindexes(self.kanas, Math.max(0, self.options.answers - similarIndexes.length - 1), questionIndex );
+            const otherIndexes = utils.randindexes(self.kanas, Math.max(0, self.options.answers - similarIndexes.length - 1), questionIndex, ...similarIndexes );
 
             self.question = self.kanas[questionIndex][mapping[0]];
             self.answers = [ questionIndex ]
