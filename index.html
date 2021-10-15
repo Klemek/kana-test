@@ -22,7 +22,7 @@
   <body>
     <main id="app" style="display: none">
       <h1>{{title}}</h1>
-      <div id='score'>score : {{ score }}</div>
+      <div id='score'>score : {{ score }} / highscore : {{ highscore }}</div>
       <div id='question'><span>{{question}}</span></div>
       <div id='answers'>
         <div class='answer' type="button" v-for='v in answers' v-on:click="answer(v)" :class="{disabled:wrongAnswers.contains(v)}">{{ v }}</div>

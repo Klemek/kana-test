@@ -133,11 +133,26 @@ Array.prototype.unique = function () {
     return utils.unique(this);
 };
 
+const cookies = {
+    set: function (name, value, days = undefined) {
+        const maxAge = !days ? undefined : days * 864e2;
+        document.cookie = `${name}=${encodeURIComponent(value)}${maxAge ? `;max-age=${maxAge};` : ''}`;
+    },
+    get: function (name) {
+        return document.cookie.split('; ').reduce(function (r, v) {
+            const parts = v.split('=');
+            return parts[0] === name ? decodeURIComponent(parts[1]) : r;
+        }, '');
+    },
+};
+
 let app = {
     el: '#app',
     data: {
         title: 'Kana Test',
         score: 0,
+        highscore: 0,
+        savedHighscores: {},
         options: {
             available: kanas.rows,
             selected: kanas.rows,
@@ -200,7 +215,7 @@ let app = {
                     similarIndexes.push(self.kanas.indexOf(self.findKana(trapKana)));
                 });
             }
-            if (kana[0].length !== 1 || kana[0] !== 'N') {
+            if (kana[0] !== 'N') {
                 const sameRow = self.kanas.filter((kana2, i) => !similarIndexes.contains(i) && kana2 !== kana && kana2[3] === kana[3]);
                 if (sameRow.length > 0) {
                     similarIndexes.push(self.kanas.indexOf(utils.randitem(sameRow)));
@@ -246,6 +261,11 @@ let app = {
 
             if (question.contains(v)) {
                 self.score += 1;
+                if (self.score > self.highscore) {
+                    self.highscore = self.score;
+                    self.savedHighscores[btoa(JSON.stringify(self.options))] = self.highscore;
+                    cookies.set('highscores', btoa(JSON.stringify(self.savedHighscores)));
+                }
                 self.generateQuestion();
             } else {
                 self.score = 0;
@@ -256,15 +276,38 @@ let app = {
         },
         changeOption: function () {
             const self = this;
+
             if (self.options.mappings.length === 0) {
                 self.options.mappings.push(0);
             }
             if (self.options.selected.length === 0) {
                 self.options.selected.push('');
             }
+
+            cookies.set('options', btoa(JSON.stringify(self.options)));
+
+            self.highscore = self.savedHighscores[btoa(JSON.stringify(self.options))] ?? 0;
             self.score = 0;
             self.buildKanas();
             self.generateQuestion();
+        },
+        readCookies: function() {
+            const self = this;
+
+            const savedOptions = cookies.get('options');
+            if (savedOptions) {
+                try {
+                    self.options = JSON.parse(atob(savedOptions));
+                } catch (e) { /* ignored */ }
+            }
+
+            const savedHighscores = cookies.get('highscores');
+            if (savedHighscores) {
+                try {
+                    self.savedHighscores = JSON.parse(atob(savedHighscores));
+                    self.highscore = self.savedHighscores[btoa(JSON.stringify(self.options))] ?? 0;
+                } catch (e) { /* ignored */ }
+            }
         },
     },
     mounted: function () {
@@ -274,6 +317,7 @@ let app = {
             self.$el.setAttribute('style', '');
         });
         self.buildKanas();
+        self.readCookies();
         self.generateQuestion();
     },
 };
