@@ -16,30 +16,30 @@ const kanas = {
         '(N)',
     ],
     hiraganas: [
-        [ 'あ', 'い', 'う', 'え', 'お' ],
-        [ 'か', 'き', 'く', 'け', 'こ' ],
-        [ 'さ', 'し', 'す', 'せ', 'そ' ],
-        [ 'た', 'ち', 'つ', 'て', 'と' ],
-        [ 'な', 'に', 'ぬ', 'ね', 'の' ],
-        [ 'は', 'ひ', 'ふ', 'へ', 'ほ' ],
-        [ 'ま', 'み', 'む', 'め', 'も' ],
-        [ 'や', '', 'ゆ', '', 'よ' ],
-        [ 'ら', 'り', 'る', 'れ', 'ろ' ],
-        [ 'わ', '', '', '', 'を' ],
-        [ 'ん' ],
+        'あいうえお',
+        'かきくけこ',
+        'さしすせそ',
+        'たちつてと',
+        'なにぬねの',
+        'はひふへほ',
+        'まみむめも',
+        'や ゆ よ',
+        'らりるれろ',
+        'わ   を',
+        'ん',
     ],
     katakanas: [
-        [ 'ア', 'イ', 'ウ', 'エ', 'オ' ],
-        [ 'カ', 'キ', 'ク', 'ケ', 'コ' ],
-        [ 'サ', 'シ', 'ス', 'セ', 'ソ' ],
-        [ 'タ', 'チ', 'ツ', 'テ', 'ト' ],
-        [ 'ナ', 'ニ', 'ヌ', 'ネ', 'ノ' ],
-        [ 'ハ', 'ヒ', 'フ', 'ヘ', 'ホ' ],
-        [ 'マ', 'ミ', 'ム', 'メ', 'モ' ],
-        [ 'ヤ', '', 'ユ', '', 'ヨ' ],
-        [ 'ラ', 'リ', 'ル', 'レ', 'ロ' ],
-        [ 'ワ', '', '', '', 'ヲ' ],
-        [ 'ン' ],
+        'アイウエオ',
+        'カキクケコ',
+        'サシスセソ',
+        'タチツテト',
+        'ナニヌネノ',
+        'ハヒフヘホ',
+        'マミムメモ',
+        'ヤ ユ ヨ',
+        'ラリルレロ',
+        'ワ   ヲ',
+        'ン',
     ],
     exceptions: {
         SI: 'SHI',
@@ -48,12 +48,21 @@ const kanas = {
         HU: 'FU',
     },
     traps: {
-        hiraganas: {
-            //TODO
-        },
-        katakanas: {
-            //TODO
-        },
+        hiraganas: [
+            'うえふら',
+            'いりにけはほ',
+            'あおぬめ',
+            'れねわ',
+            'しも',
+            'つてと',
+            'るろそ',
+            'まはほよ',
+            'くへ',
+            'たなを',
+            'えん',
+            'きさち',
+        ],
+        katakanas: [],
     },
     mappings: [
         [ 0, 1 ],
@@ -79,21 +88,23 @@ const utils = {
         } while (this.contains(toIgnore, index));
         return index;
     },
-    randitem: function (array) {
+    randitem: function (array, ...toIgnore) {
         if (array.length === 0) {
             return undefined;
         }
-        return array[this.randindex(array)];
+        return array[this.randindex(array, ...toIgnore)];
     },
     randindexes: function (array, number, ...toIgnore) {
-        if (array.length === 0 || toIgnore.length >= array.length) {
-            return [];
-        }
+        number = Math.min(number, array.length - toIgnore.length);
         const output = [];
         for (let i = 0; i < number; i++) {
             output.push(this.randindex(array, ...output, ...toIgnore));
         }
         return output;
+    },
+    randitems: function (array, number) {
+        const indexes = this.randindexes(array, number);
+        return indexes.map(i => array[i]);
     },
     shuffle: function (array) {
         const output = [ ...array ];
@@ -107,6 +118,9 @@ const utils = {
     contains: function (array, item) {
         return array.indexOf(item) >= 0;
     },
+    unique: function (array) {
+        return [ ...new Set(array) ];
+    },
 };
 
 Array.prototype.shuffle = function () {
@@ -114,6 +128,9 @@ Array.prototype.shuffle = function () {
 };
 Array.prototype.contains = function (item) {
     return utils.contains(this, item);
+};
+Array.prototype.unique = function () {
+    return utils.unique(this);
 };
 
 let app = {
@@ -158,7 +175,7 @@ let app = {
                         const text = kanas.exceptions[prefix + suffix]
                             ? kanas.exceptions[prefix + suffix]
                             : prefix + suffix;
-                        if (kanas.hiraganas[row][column] || kanas.katakanas[row][column]) {
+                        if (kanas.hiraganas[row][column] !== ' ') {
                             self.kanas.push([ text, kanas.hiraganas[row][column], kanas.katakanas[row][column], row, column ]);
                         }
                     });
@@ -169,18 +186,19 @@ let app = {
             const self = this;
             const kana = self.kanas[kanaIndex];
             const similarIndexes = [];
-            if (mapping.contains(1) && kanas.traps.hiraganas[kana[1]]) {
-                const trap = self.findKana(utils.randitem(kanas.traps.hiraganas[kana[1]]));
-                const trapIndex = self.kanas.indexOf(trap);
-                similarIndexes.push(trapIndex);
+            if (mapping.contains(1)) {
+                const traps = kanas.traps.hiraganas.filter(line => line.includes(kana[1]));
+                utils.randitems(traps, 2).forEach(line => {
+                    const trapKana = utils.randitem(line.split(''), line.indexOf(kana[1]));
+                    similarIndexes.push(self.kanas.indexOf(self.findKana(trapKana)));
+                });
             }
-            if (mapping.contains(2) && kanas.traps.katakanas[kana[2]]) {
-                const trap = self.findKana(utils.randitem(kanas.traps.hiraganas[kana[1]]));
-                const trapIndex = self.kanas.indexOf(trap);
-
-                if (!similarIndexes.contains(trapIndex)) {
-                    similarIndexes.push(self.kanas.indexOf(trap));
-                }
+            if (mapping.contains(2)) {
+                const traps = kanas.traps.katakanas.filter(line => line.includes(kana[2]));
+                utils.randitems(traps, 2).forEach(line => {
+                    const trapKana = utils.randitem(line.split(''), line.indexOf(kana[2]));
+                    similarIndexes.push(self.kanas.indexOf(self.findKana(trapKana)));
+                });
             }
             if (kana[0].length !== 1 || kana[0] !== 'N') {
                 const sameRow = self.kanas.filter((kana2, i) => !similarIndexes.contains(i) && kana2 !== kana && kana2[3] === kana[3]);
@@ -192,7 +210,7 @@ let app = {
                     similarIndexes.push(self.kanas.indexOf(utils.randitem(sameColumn)));
                 }
             }
-            return similarIndexes;
+            return similarIndexes.unique();
         },
         generateQuestion: function () {
             const self = this;
