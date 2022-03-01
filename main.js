@@ -63,7 +63,8 @@ const kanas = {
             'きさち',
         ],
         katakanas: [
-            'ンソシ',
+            'ンソ',
+            'シシ',
             'ノメ',
             'クケタ',
             'コロヨ',
@@ -238,7 +239,7 @@ let app = {
                     similarIndexes.push(self.kanas.indexOf(utils.randitem(sameColumn)));
                 }
             }
-            return similarIndexes.unique();
+            return similarIndexes.unique().filter(i => i >= 0);
         },
         generateQuestion: function () {
             const self = this;
